@@ -6,9 +6,11 @@
         <router-view :key="$route.path" v-slot="{ Component }">
             <component :is="Component" />
         </router-view>
+        <Footer />
     </div>
 </template>
 
 <script setup>
 import Navigation from './Navigation.vue';
+import Footer from './Footer.vue';
 </script>

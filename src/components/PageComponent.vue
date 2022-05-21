@@ -10,7 +10,7 @@
         </div>
     </header>
     <main>
-        <div class="container pt-3 pb-6">
+        <div class="container pt-3 pb-16">
             <slot />
         </div>
     </main>

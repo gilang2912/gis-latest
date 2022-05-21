@@ -16,6 +16,7 @@
                 <div class="flex items-center">
                     <Dropdown name="Nama">
                         <DropdownLink path="#">Profile</DropdownLink>
+                        <DropdownLink path="#" name="Logout" />
                     </Dropdown>
                 </div>
             </div>
