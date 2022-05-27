@@ -12,6 +12,11 @@
                 <div class="flex items-center gap-4 font-medium">
                     <NavLink to="/dashboard">Dashboard</NavLink>
                     <NavLink to="/objek-pajak">Objek Pajak</NavLink>
+                    <Dropdown name="Aplikasi">
+                        <DropdownLink path="#">Manage Users</DropdownLink>
+                        <DropdownLink path="#">Privileges</DropdownLink>
+                        <DropdownLink path="#">Referensi</DropdownLink>
+                    </Dropdown>
                 </div>
                 <div class="flex items-center">
                     <Dropdown name="Nama">
