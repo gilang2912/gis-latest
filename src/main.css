@@ -17,4 +17,76 @@
         @apply bg-blue-600 dark:bg-blue-800;
         border-radius: 0;
     }
+    /* Listings Sidebar  */
+    .sidebar {
+        @apply absolute top-0 left-0 z-30 w-1/5 h-full overflow-hidden;
+        @apply border-r border-gray-400 border-solid bg-gray-50 dark:border-slate-800 dark:bg-slate-900;
+    }
+    .listings {
+        @apply h-full pb-32 overflow-auto;
+    }
+    .listings .item {
+        @apply border-b border-gray-300 border-solid dark:border-slate-800;
+        @apply p-3 cursor-pointer;
+        @apply hover:bg-slate-800 hover:text-slate-50 hover:dark:bg-slate-100 hover:dark:text-slate-800;
+        @apply transition duration-150 ease-linear;
+    }
+    .listings .item:last-child {
+        @apply border-b-0;
+    }
+    .listings .item:hover .title {
+        @apply dark:text-slate-800 text-slate-50;
+    }
+    .listings .item .title {
+        @apply block text-sm font-semibold text-slate-800 dark:text-slate-100;
+    }
+    .listings .item .title small {
+        @apply text-sm font-medium dark:text-slate-100;
+    }
+    .listings .item.active .title,
+    .listings .item .title:hover {
+        @apply text-gray-200;
+    }
+    .listings .item.active {
+        @apply bg-blue-800 text-gray-50;
+    }
+    /* Pin & Popup marker */
+    .pin {
+        @apply bg-slate-800 dark:bg-slate-800;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        @apply shadow shadow-slate-600;
+    }
+    .pin:after {
+        content: '';
+        display: block;
+        width: 18px;
+        height: 18px;
+        margin: 6px auto;
+        border-radius: 50%;
+        @apply shadow-lg animate-pulse;
+    }
+    .pin-red:after {
+        @apply bg-red-500;
+    }
+    .pin-green:after {
+        @apply bg-green-600;
+    }
+    .pin-yellow:after {
+        @apply bg-yellow-500;
+    }
+    .pin-blue:after {
+        @apply bg-sky-500;
+    }
+    .pin-gray:after {
+        @apply bg-slate-500;
+    }
+    .mapboxgl-popup {
+        @apply max-w-lg;
+    }
+    .mapboxgl-popup-content {
+        @apply font-sans;
+        @apply max-w-md;
+    }
 }

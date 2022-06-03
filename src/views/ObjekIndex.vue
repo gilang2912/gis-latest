@@ -1,7 +1,15 @@
 <template>
     <PageComponent heading="Objek Pajak">
-        <tabs>
-            <tab title="Objek Pajak">
+        <TabCustom>
+            <template #tabTitle1>
+                <ViewListIcon class="w-4 h-4" />
+                Objek Pajak
+            </template>
+            <template #tabTitle2>
+                <PencilAltIcon class="w-4 h-4" />
+                Input Objek Pajak
+            </template>
+            <template #tabContent1>
                 <div
                     class="relative mt-1 overflow-x-auto shadow-md bg-slate-50 dark:bg-slate-900 sm:rounded-lg md:rounded-md"
                 >
@@ -28,7 +36,7 @@
                                 type="text"
                                 id="table-search"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="Search for items"
+                                placeholder="Cari Objek Pajak"
                             />
                         </div>
                     </div>
@@ -39,81 +47,110 @@
                             class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
                         >
                             <tr>
+                                <th scope="col" class="px-6 py-3">NO.</th>
                                 <th scope="col" class="px-6 py-3">
-                                    Product name
+                                    Kode Objek Pajak
                                 </th>
-                                <th scope="col" class="px-6 py-3">Color</th>
-                                <th scope="col" class="px-6 py-3">Category</th>
-                                <th scope="col" class="px-6 py-3">Price</th>
+                                <th scope="col" class="px-6 py-3">
+                                    Nama Wajib Pajak
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Objek Pajak
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Lokasi Objek Pajak
+                                </th>
+                                <th scope="col" class="px-6 py-3">Ket.</th>
                                 <th scope="col" class="px-6 py-3">
                                     <span class="sr-only">Edit</span>
+                                    Actions
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr
+                                v-if="op.loading"
                                 class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                             >
-                                <th
-                                    scope="row"
-                                    class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
+                                <td
+                                    class="px-6 py-4 font-semibold text-center"
+                                    colspan="7"
                                 >
-                                    Apple MacBook Pro 17"
-                                </th>
-                                <td class="px-6 py-4">Sliver</td>
-                                <td class="px-6 py-4">Laptop</td>
-                                <td class="px-6 py-4">$2999</td>
-                                <td class="px-6 py-4 text-right">
-                                    <a
-                                        href="#"
-                                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                        >Edit</a
-                                    >
+                                    Loading ...
                                 </td>
                             </tr>
                             <tr
+                                v-else-if="!op.data.data.length"
+                                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                            >
+                                <td
+                                    class="px-6 py-4 font-semibold text-center"
+                                    colspan="7"
+                                >
+                                    Data objek pajak tidak ditemukan.
+                                </td>
+                            </tr>
+                            <tr
+                                v-else
+                                v-for="(item, index) in op.data.data"
+                                :key="index"
                                 class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                             >
                                 <th
                                     scope="row"
                                     class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
                                 >
-                                    Microsoft Surface Pro
+                                    {{ index + 1 }}
                                 </th>
-                                <td class="px-6 py-4">White</td>
-                                <td class="px-6 py-4">Laptop PC</td>
-                                <td class="px-6 py-4">$1999</td>
-                                <td class="px-6 py-4 text-right">
-                                    <a
-                                        href="#"
-                                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                        >Edit</a
-                                    >
+                                <td class="px-6 py-4">{{ item.kd_op }}</td>
+                                <td class="px-6 py-4">{{ item.nm_wp }}</td>
+                                <td class="px-6 py-4">
+                                    {{ item.objek_pajak }}
                                 </td>
-                            </tr>
-                            <tr class="bg-white dark:bg-gray-800">
-                                <th
-                                    scope="row"
-                                    class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
-                                >
-                                    Magic Mouse 2
-                                </th>
-                                <td class="px-6 py-4">Black</td>
-                                <td class="px-6 py-4">Accessories</td>
-                                <td class="px-6 py-4">$99</td>
+                                <td class="px-6 py-4">
+                                    {{ item.lokasi_objek }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ item.keterangan }}
+                                </td>
                                 <td class="px-6 py-4 text-right">
-                                    <a
-                                        href="#"
-                                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                        >Edit</a
-                                    >
+                                    <div class="flex items-center gap-2">
+                                        <router-link
+                                            title="Lihat Detail"
+                                            :to="{
+                                                name: 'ObjekDetail',
+                                                params: {
+                                                    kdop: item.kd_op,
+                                                },
+                                            }"
+                                            class="font-medium text-slate-600 dark:text-slate-300 hover:underline"
+                                        >
+                                            <EyeIcon class="w-5 h-5" />
+                                        </router-link>
+                                        <button
+                                            @click="openEdit(item.kd_op)"
+                                            class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                                        >
+                                            <PencilAltIcon class="w-5 h-5" />
+                                        </button>
+                                        <button
+                                            @click="openDelete(item.kd_op)"
+                                            class="font-medium text-red-600 dark:text-red-500 hover:underline"
+                                        >
+                                            <TrashIcon class="w-5 h-5" />
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-            </tab>
-            <tab title="Input Objek Pajak">
+                <Pagination
+                    :data="op.data"
+                    @pagination-change-page="list"
+                ></Pagination>
+            </template>
+            <template #tabContent2>
                 <div class="grid grid-cols-2 gap-4 mt-1">
                     <div
                         class="p-4 rounded-md shadow bg-slate-50 dark:bg-slate-900"
@@ -128,6 +165,7 @@
                                             @keyup="getOpDetail"
                                             :required="true"
                                             v-model="state.kd_op"
+                                            :value="state.kd_op"
                                         />
                                     </div>
                                     <div>
@@ -198,6 +236,7 @@
                                             id="long"
                                             :required="true"
                                             v-model="state.long"
+                                            :value="state.long"
                                         />
                                     </div>
                                     <div>
@@ -206,6 +245,7 @@
                                             id="lat"
                                             :required="true"
                                             v-model="state.lat"
+                                            :value="state.lat"
                                         />
                                     </div>
                                 </div>
@@ -242,7 +282,9 @@
                                     class="block p-2.5 w-full outline-none text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-600 dark:focus:border-indigo-500 transition duration-150 ease-linear"
                                     placeholder="Keterangan"
                                     v-model="state.ket"
-                                ></textarea>
+                                >
+                                    {{ state.ket }}
+                                </textarea>
                             </div>
                             <div class="flex items-center justify-end gap-2">
                                 <BtnDark type="reset">Reset</BtnDark>
@@ -250,21 +292,154 @@
                             </div>
                         </form>
                     </div>
+                    <transition>
+                        <ToastSuccess
+                            v-if="toast.success.show"
+                            :message="toast.success.message"
+                            @close="closeSuccessToast"
+                        />
+                    </transition>
+                    <transition>
+                        <ToastWarning
+                            v-if="toast.warning.show"
+                            :message="toast.warning.message"
+                            @close="closeWarningToast"
+                        />
+                    </transition>
                 </div>
-            </tab>
-        </tabs>
+            </template>
+        </TabCustom>
     </PageComponent>
+    <!-- Modal Update OP -->
+    <Modal
+        v-show="modalEditOpen"
+        title="Edit Objek Pajak"
+        submitName="Update"
+        @actionForm="handleUpdate"
+        @close="closeEdit"
+    >
+        <form>
+            <div class="mb-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <InputControl
+                            label="Objek Pajak"
+                            id="Objek Pajak"
+                            :required="true"
+                            v-model="state.objek_pajak"
+                            :value="state.objek_pajak"
+                        />
+                    </div>
+                    <div>
+                        <InputControl
+                            label="Lokasi Objek Pajak"
+                            id="lokasi_objek"
+                            :required="true"
+                            v-model="state.lokasi_objek"
+                            :value="state.lokasi_objek"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <InputControl
+                            label="longitude"
+                            id="long"
+                            :required="true"
+                            v-model="state.long"
+                            :value="state.long"
+                        />
+                    </div>
+                    <div>
+                        <InputControl
+                            label="Latitude"
+                            id="lat"
+                            :required="true"
+                            v-model="state.lat"
+                            :value="state.lat"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    for="image_reklame"
+                    >Upload foto reklame</label
+                >
+                <input
+                    class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                    id="image_reklame"
+                    type="file"
+                    @change="onImageChange"
+                    multiple
+                />
+                <div
+                    class="mt-1 text-sm text-slate-500 dark:text-slate-300"
+                    id="user_avatar_help"
+                >
+                    Maximum ukuran foto yang diupload 1MB
+                </div>
+            </div>
+            <div class="mb-4">
+                <label
+                    for="message"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
+                    >Keterangan</label
+                >
+                <textarea
+                    id="message"
+                    rows="4"
+                    class="block p-2.5 w-full outline-none text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-slate-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-indigo-600 dark:focus:border-indigo-500 transition duration-150 ease-linear"
+                    placeholder="Keterangan"
+                    v-model="state.ket"
+                >
+                {{ state.ket }}
+                </textarea>
+            </div>
+        </form>
+    </Modal>
+    <!-- Modal Delete OP -->
+    <Modal
+        v-show="modalDeleteOpen"
+        submitName="Delete"
+        @actionForm="handleDelete"
+        @close="closeDelete"
+        :danger="true"
+    >
+        <template #title>
+            <TrashIcon class="w-4 h-4" />
+            Hapus Objek Pajak
+        </template>
+        <h1 class="py-2 text-sm font-medium">
+            Anda yakin menghapus data objek pajak ini?
+        </h1>
+    </Modal>
 </template>
 
 <script setup>
 import PageComponent from '@/components/PageComponent.vue';
-import Tabs from '@/components/Tabs.vue';
-import Tab from '@/components/Tab.vue';
+import TabCustom from '@/components/TabCustom.vue';
 import InputControl from '@/components/partials/InputControl.vue';
 import BtnPrimary from '@/components/partials/BtnPrimary.vue';
 import BtnDark from '@/components/partials/BtnDark.vue';
-import { reactive } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { clientLocal } from '@/http';
+import ToastSuccess from '@/components/ToastSuccess.vue';
+import ToastWarning from '@/components/ToastWarning.vue';
+import { useStore } from 'vuex';
+import {
+    PencilAltIcon,
+    TrashIcon,
+    EyeIcon,
+    ViewListIcon,
+} from '@heroicons/vue/outline';
+import Modal from '@/components/Modal.vue';
+import Pagination from '@/components/partials/Pagination.vue';
+
+const store = useStore();
 
 const state = reactive({
     kd_op: '',
@@ -284,6 +459,32 @@ const state = reactive({
     img_tmp: [],
 });
 
+const toast = reactive({
+    success: {
+        show: false,
+        message: '',
+    },
+    warning: {
+        show: false,
+        message: '',
+    },
+});
+
+const modalEditOpen = ref(false);
+const modalDeleteOpen = ref(false);
+
+store.dispatch('op/getOp');
+
+async function list(page = 1) {
+    store.commit('op/setOpLoading', true);
+    await clientLocal.get(`/objek-pajak?page=${page}`).then(({ data }) => {
+        store.commit('op/setOpLoading', false);
+        store.commit('op/setOp', data);
+    });
+}
+
+const op = computed(() => store.state.op);
+
 async function getOpDetail() {
     await clientLocal
         .post('/paylist', {
@@ -300,7 +501,12 @@ async function getOpDetail() {
             state.lebar = data.data.lebar;
             state.tinggi = data.data.tinggi;
         })
-        .catch((err) => console.error(err.message));
+        .catch((err) => {
+            if (err.response.status == 404) {
+                toast.warning.message = err.response.data.message;
+                toast.warning.show = true;
+            }
+        });
 }
 
 function onImageChange(e) {
@@ -326,9 +532,95 @@ async function handleSubmit() {
         .post('/objek-pajak/create', state)
         .then((res) => {
             if (res.status == 201) {
-                console.log(res.data.message);
+                store.dispatch('op/getOp');
+                toast.success.message = res.data.message;
+                toast.success.show = true;
+
+                state.kd_op = '';
+                state.npwpd = '';
+                state.nm_wp = '';
+                state.objek_pajak = '';
+                state.lokasi_objek = '';
+                state.jns_reklame = '';
+                state.kecamatan = '';
+                state.panjang = '';
+                state.lebar = '';
+                state.tinggi = '';
+                state.long = '';
+                state.lat = '';
+                state.images = [];
+                state.ket = '';
+
+                setTimeout(() => {
+                    toast.success.show = false;
+                    toast.success.message = '';
+                }, 2000);
             }
         })
         .catch((err) => console.error(err));
+}
+
+function closeSuccessToast() {
+    toast.success.show = false;
+}
+
+function closeWarningToast() {
+    toast.warning.show = false;
+}
+
+function handleUpdate() {
+    store
+        .dispatch('op/update', state)
+        .then((res) => {
+            if (res.status == 200) {
+                alert(res.data.message);
+                modalEditOpen.value = false;
+            }
+        })
+        .catch((err) => console.error(err));
+}
+
+function openEdit(kd_op) {
+    state.kd_op = kd_op;
+    modalEditOpen.value = true;
+    store.dispatch('op/getCurrent', kd_op).then((res) => {
+        state.objek_pajak = res.data.objek_pajak;
+        state.lokasi_objek = res.data.lokasi_objek;
+        state.long = res.data.coordinate.long;
+        state.lat = res.data.coordinate.lat;
+        state.ket = res.data.keterangan;
+    });
+}
+
+function closeEdit() {
+    state.kd_op = '';
+    state.objek_pajak = '';
+    state.lokasi_objek = '';
+    state.long = '';
+    state.lat = '';
+    state.ket = '';
+    state.images = [];
+    modalEditOpen.value = false;
+}
+
+function handleDelete() {
+    const param = {
+        kd_op: state.kd_op,
+    };
+    store.dispatch('op/delete', param).then((res) => {
+        if (res.status == 204) {
+            modalDeleteOpen.value = false;
+        }
+    });
+}
+
+function openDelete(kd_op) {
+    state.kd_op = kd_op;
+    modalDeleteOpen.value = true;
+}
+
+function closeDelete() {
+    state.kd_op = '';
+    modalDeleteOpen.value = false;
 }
 </script>
