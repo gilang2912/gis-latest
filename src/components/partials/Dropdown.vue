@@ -2,9 +2,10 @@
     <div v-click-outside="hide" class="relative">
         <button
             @click="show"
-            class="inline-flex items-center gap-2 py-2 font-medium transition duration-150 ease-linear md:text-sm hover:text-slate-800 hover:dark:text-slate-600"
+            class="inline-flex items-center gap-1 py-2 font-medium capitalize transition duration-150 ease-linear md:text-sm hover:text-slate-800 hover:dark:text-slate-600"
         >
-            {{ name }}
+            <span v-if="name">{{ name }}</span>
+            <slot name="name"></slot>
             <ChevronDownIcon
                 class="w-4 h-4 transition-transform duration-200 transform"
                 :class="{

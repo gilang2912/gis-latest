@@ -6,6 +6,7 @@
                     {{ heading }}
                 </h4>
                 <slot name="heading"></slot>
+                <Breadcrumb />
             </div>
         </div>
     </header>
@@ -17,6 +18,8 @@
 </template>
 
 <script setup>
+import Breadcrumb from './partials/Breadcrumb.vue';
+
 defineProps({
     heading: String,
 });

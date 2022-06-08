@@ -6,7 +6,7 @@
                 Pengguna
             </template>
             <template #tabTitle2>
-                <PencilAltIcon class="w-4 h-4" />
+                <UserAddIcon class="w-4 h-4" />
                 Tambah Pengguna
             </template>
             <template #tabContent1>
@@ -36,7 +36,9 @@
                                 type="text"
                                 id="table-search"
                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="Search for items"
+                                placeholder="Cara pengguna"
+                                v-model="query"
+                                @keyup.enter="searchUser"
                             />
                         </div>
                     </div>
@@ -70,6 +72,18 @@
                                 </td>
                             </tr>
                             <tr
+                                v-else-if="!users.data.data.length"
+                                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                            >
+                                <td
+                                    class="px-6 py-4 font-semibold text-center"
+                                    colspan="7"
+                                >
+                                    Data pengguna tidak ditemukan.
+                                </td>
+                            </tr>
+                            <tr
+                                v-else
                                 v-for="(u, index) in users.data.data"
                                 :key="index"
                                 class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -192,7 +206,10 @@
         @actionForm="handleUpdate"
         @close="closeEdit"
     >
-        <template #title>Update data pengguna</template>
+        <template #title>
+            <PencilAltIcon class="w-4 h-4" />
+            Update data pengguna
+        </template>
         <form>
             <div class="mb-4">
                 <InputControl
@@ -238,7 +255,12 @@ import InputControl from '@/components/partials/InputControl.vue';
 import BtnPrimary from '@/components/partials/BtnPrimary.vue';
 import BtnDark from '@/components/partials/BtnDark.vue';
 import ToastSuccess from '@/components/ToastSuccess.vue';
-import { ViewListIcon, PencilAltIcon, TrashIcon } from '@heroicons/vue/outline';
+import {
+    ViewListIcon,
+    PencilAltIcon,
+    TrashIcon,
+    UserAddIcon,
+} from '@heroicons/vue/outline';
 import { computed, reactive, ref } from 'vue';
 import { useStore } from 'vuex';
 
@@ -271,6 +293,10 @@ const query = ref('');
 store.dispatch('users/getAll');
 
 const users = computed(() => store.state.users);
+
+function searchUser() {
+    store.dispatch('users/getAll', { q: query.value });
+}
 
 function list(page = 1) {
     store.dispatch('users/getAll', {

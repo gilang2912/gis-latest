@@ -21,9 +21,9 @@ export const mutations = {
 };
 
 export const actions = {
-    async getOp({ commit }) {
+    async getOp({ commit }, q = '') {
         commit('setOpLoading', true);
-        const { data } = await clientLocal.get('/objek-pajak');
+        const { data } = await clientLocal.get(`/objek-pajak?q=${q}`);
         commit('setOpLoading', false);
         commit('setOp', data);
         return data;

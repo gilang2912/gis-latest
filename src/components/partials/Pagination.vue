@@ -10,7 +10,7 @@
     >
         <div
             v-bind="$attrs"
-            class="flex flex-col items-center px-4 py-4 border-t bg-slate-100 dark:bg-slate-900 xs:flex-row xs:justify-between"
+            class="flex flex-col items-center px-4 py-4 border-t rounded-b-lg bg-slate-200 dark:bg-slate-900 xs:flex-row xs:justify-between"
         >
             <span
                 class="mb-1 text-sm font-medium text-gray-900 dark:text-slate-50 xs:text-xs"

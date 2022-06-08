@@ -13,6 +13,7 @@
                     class="relative flex items-center rounded-md shadow bg-slate-50 dark:bg-slate-900"
                 >
                     <button
+                        v-if="currentOp.current.images.length > 1"
                         @click="prev"
                         class="absolute px-4 py-2 rounded hover:ring-1 hover:ring-slate-800"
                     >
@@ -32,6 +33,7 @@
                         />
                     </div>
                     <button
+                        v-if="currentOp.current.images.length > 1"
                         @click="next"
                         class="absolute right-0 px-4 py-2 rounded hover:ring-1 hover:ring-slate-800"
                     >

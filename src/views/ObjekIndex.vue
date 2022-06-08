@@ -6,7 +6,7 @@
                 Objek Pajak
             </template>
             <template #tabTitle2>
-                <PencilAltIcon class="w-4 h-4" />
+                <PlusCircleIcon class="w-4 h-4" />
                 Input Objek Pajak
             </template>
             <template #tabContent1>
@@ -35,8 +35,10 @@
                             <input
                                 type="text"
                                 id="table-search"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 transition duration-150 ease-linear"
                                 placeholder="Cari Objek Pajak"
+                                v-model="query"
+                                @keyup.enter="searchOp"
                             />
                         </div>
                     </div>
@@ -81,7 +83,7 @@
                             </tr>
                             <tr
                                 v-else-if="!op.data.data.length"
-                                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                             >
                                 <td
                                     class="px-6 py-4 font-semibold text-center"
@@ -94,7 +96,7 @@
                                 v-else
                                 v-for="(item, index) in op.data.data"
                                 :key="index"
-                                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                             >
                                 <th
                                     scope="row"
@@ -162,7 +164,7 @@
                                         <InputControl
                                             label="Kode Objek Pajak"
                                             id="kd_op"
-                                            @keyup="getOpDetail"
+                                            @keyup.stop="getOpDetail"
                                             :required="true"
                                             v-model="state.kd_op"
                                             :value="state.kd_op"
@@ -312,7 +314,7 @@
     </PageComponent>
     <!-- Modal Update OP -->
     <Modal
-        v-show="modalEditOpen"
+        v-show="modal.edit.show"
         title="Edit Objek Pajak"
         submitName="Update"
         @actionForm="handleUpdate"
@@ -403,7 +405,7 @@
     </Modal>
     <!-- Modal Delete OP -->
     <Modal
-        v-show="modalDeleteOpen"
+        v-show="modal.delete.show"
         submitName="Delete"
         @actionForm="handleDelete"
         @close="closeDelete"
@@ -432,6 +434,7 @@ import ToastWarning from '@/components/ToastWarning.vue';
 import { useStore } from 'vuex';
 import {
     PencilAltIcon,
+    PlusCircleIcon,
     TrashIcon,
     EyeIcon,
     ViewListIcon,
@@ -470,20 +473,34 @@ const toast = reactive({
     },
 });
 
-const modalEditOpen = ref(false);
-const modalDeleteOpen = ref(false);
+const modal = reactive({
+    edit: {
+        show: false,
+    },
+    delete: {
+        show: false,
+    },
+});
+
+const query = ref('');
 
 store.dispatch('op/getOp');
 
-async function list(page = 1) {
-    store.commit('op/setOpLoading', true);
-    await clientLocal.get(`/objek-pajak?page=${page}`).then(({ data }) => {
-        store.commit('op/setOpLoading', false);
-        store.commit('op/setOp', data);
-    });
+const op = computed(() => store.state.op);
+
+async function searchOp() {
+    store.dispatch('op/getOp', query.value);
 }
 
-const op = computed(() => store.state.op);
+async function list(page = 1) {
+    store.commit('op/setOpLoading', true);
+    await clientLocal
+        .get(`/objek-pajak?q=${query.value}&page=${page}`)
+        .then(({ data }) => {
+            store.commit('op/setOpLoading', false);
+            store.commit('op/setOp', data);
+        });
+}
 
 async function getOpDetail() {
     await clientLocal
@@ -574,7 +591,7 @@ function handleUpdate() {
         .then((res) => {
             if (res.status == 200) {
                 alert(res.data.message);
-                modalEditOpen.value = false;
+                modal.edit.show = false;
             }
         })
         .catch((err) => console.error(err));
@@ -582,7 +599,7 @@ function handleUpdate() {
 
 function openEdit(kd_op) {
     state.kd_op = kd_op;
-    modalEditOpen.value = true;
+    modal.edit.show = true;
     store.dispatch('op/getCurrent', kd_op).then((res) => {
         state.objek_pajak = res.data.objek_pajak;
         state.lokasi_objek = res.data.lokasi_objek;
@@ -600,7 +617,7 @@ function closeEdit() {
     state.lat = '';
     state.ket = '';
     state.images = [];
-    modalEditOpen.value = false;
+    modal.edit.show = false;
 }
 
 function handleDelete() {
@@ -609,18 +626,18 @@ function handleDelete() {
     };
     store.dispatch('op/delete', param).then((res) => {
         if (res.status == 204) {
-            modalDeleteOpen.value = false;
+            modal.delete.show = false;
         }
     });
 }
 
 function openDelete(kd_op) {
     state.kd_op = kd_op;
-    modalDeleteOpen.value = true;
+    modal.delete.show = true;
 }
 
 function closeDelete() {
     state.kd_op = '';
-    modalDeleteOpen.value = false;
+    modal.delete.show = false;
 }
 </script>

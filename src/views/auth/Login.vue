@@ -4,6 +4,9 @@
             <div
                 class="absolute top-0 w-full h-full bg-slate-100 dark:bg-slate-900"
                 style="background-size: 100%; background-repeat: no-repeat"
+                :style="{
+                    'background-image': 'url(' + image + ')',
+                }"
             ></div>
             <div class="container h-full px-4 mx-auto">
                 <div
@@ -23,7 +26,7 @@
                                             src="../../assets/logo-mks.png"
                                         />
                                         <LogoBapenda
-                                            class="w-12 h-12 drop-shadow-lg"
+                                            class="h-11 w-11 drop-shadow-lg"
                                         />
                                     </div>
                                     <h2
@@ -35,12 +38,7 @@
                                 <hr class="mt-6 border-slate-400 border-b-1" />
                             </div>
                             <div class="flex-auto px-4 py-10 pt-0 lg:px-10">
-                                <div
-                                    class="mb-3 font-bold text-center text-gray-500"
-                                >
-                                    <small>Sign in with credentials</small>
-                                </div>
-                                <form>
+                                <form @submit.prevent="handleLogin">
                                     <div class="relative w-full mb-3">
                                         <label
                                             class="block mb-2 text-xs font-bold text-gray-700 uppercase"
@@ -53,6 +51,8 @@
                                             style="
                                                 transition: all 0.15s ease 0s;
                                             "
+                                            required
+                                            v-model="model.username"
                                         />
                                     </div>
                                     <div class="relative w-full mb-3">
@@ -67,6 +67,8 @@
                                             style="
                                                 transition: all 0.15s ease 0s;
                                             "
+                                            required
+                                            v-model="model.password"
                                         />
                                     </div>
                                     <div>
@@ -82,34 +84,30 @@
                                                 "
                                             /><span
                                                 class="ml-2 text-sm font-semibold text-gray-700"
-                                                >Remember me</span
+                                                >Ingat saya</span
                                             ></label
                                         >
                                     </div>
                                     <div class="mt-6 text-center">
                                         <button
                                             class="w-full px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase bg-gray-900 rounded shadow outline-none active:bg-gray-700 hover:shadow-lg focus:outline-none"
-                                            type="button"
+                                            type="submit"
                                             style="
                                                 transition: all 0.15s ease 0s;
                                             "
                                         >
-                                            Sign In
+                                            <div
+                                                class="flex items-center justify-center gap-1"
+                                            >
+                                                <RefreshIcon
+                                                    v-if="auth.loading"
+                                                    class="w-4 h-4 animate-spin"
+                                                />
+                                                Login
+                                            </div>
                                         </button>
                                     </div>
                                 </form>
-                            </div>
-                        </div>
-                        <div class="flex flex-wrap mt-6">
-                            <div class="w-1/2">
-                                <a href="#pablo" class="text-gray-300"
-                                    ><small>Forgot password?</small></a
-                                >
-                            </div>
-                            <div class="w-1/2 text-right">
-                                <a href="#pablo" class="text-gray-300"
-                                    ><small>Create new account</small></a
-                                >
                             </div>
                         </div>
                     </div>
@@ -121,4 +119,30 @@
 
 <script setup>
 import LogoBapenda from '@/components/LogoBapenda.vue';
+import { RefreshIcon } from '@heroicons/vue/outline';
+import { computed, reactive } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+
+const image = 'src/assets/register_bg_2.png';
+
+const store = useStore();
+const router = useRouter();
+const model = reactive({
+    username: '',
+    password: '',
+});
+
+const handleLogin = () => {
+    store.state.auth.loading = true;
+    store
+        .dispatch('auth/login', model)
+        .then(() => {
+            store.state.auth.loading = false;
+            router.push({ name: 'Dashboard' });
+        })
+        .catch((err) => console.log(err));
+};
+
+const auth = computed(() => store.state.auth);
 </script>
