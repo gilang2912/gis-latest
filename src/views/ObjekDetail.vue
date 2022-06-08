@@ -140,6 +140,10 @@
                         </span>
                     </p>
                     <div
+                        v-if="
+                            (role && role.role_id == 1) ||
+                            (role && role.role_id == 2)
+                        "
                         class="absolute bottom-0 right-0 flex items-center pb-6 pr-6"
                     >
                         <button
@@ -218,6 +222,10 @@ const modal = reactive({
 store.dispatch('op/getWithPayment', route.params.kdop);
 
 const currentOp = computed(() => store.state.op);
+
+const role = computed(() =>
+    store.state.auth.data.role ? store.state.auth.data.role : '',
+);
 
 const payStatus = computed(() => {
     let payStat = '';

@@ -10,8 +10,15 @@
             ></div>
             <div class="container h-full px-4 mx-auto">
                 <div
-                    class="flex items-center content-center justify-center h-full"
+                    class="flex flex-col items-center content-center justify-center h-full"
                 >
+                    <transition>
+                        <ToastWarning
+                            v-if="toast.warning.show"
+                            :message="toast.warning.message"
+                            @close="toast.warning.show = false"
+                        />
+                    </transition>
                     <div class="w-full px-4 lg:w-4/12">
                         <div
                             class="relative flex flex-col w-full min-w-0 mb-6 break-words border-0 rounded-lg shadow-lg bg-slate-300"
@@ -90,7 +97,7 @@
                                     </div>
                                     <div class="mt-6 text-center">
                                         <button
-                                            class="w-full px-6 py-3 mb-1 mr-1 text-sm font-bold text-white uppercase bg-gray-900 rounded shadow outline-none active:bg-gray-700 hover:shadow-lg focus:outline-none"
+                                            class="w-full px-6 py-3 mb-1 mr-1 text-sm font-bold uppercase rounded shadow outline-none text-slate-800 dark:text-slate-50 hover:shadow-lg focus:outline-none bg-gradient-to-r from-slate-50 via-purple-500 to-red-500 dark:from-slate-900 dark:via-purple-900 dark:to-red-900 dark:border-slate-700"
                                             type="submit"
                                             style="
                                                 transition: all 0.15s ease 0s;
@@ -119,6 +126,7 @@
 
 <script setup>
 import LogoBapenda from '@/components/LogoBapenda.vue';
+import ToastWarning from '@/components/ToastWarning.vue';
 import { RefreshIcon } from '@heroicons/vue/outline';
 import { computed, reactive } from 'vue';
 import { useStore } from 'vuex';
@@ -132,6 +140,12 @@ const model = reactive({
     username: '',
     password: '',
 });
+const toast = reactive({
+    warning: {
+        show: false,
+        message: '',
+    },
+});
 
 const handleLogin = () => {
     store.state.auth.loading = true;
@@ -141,7 +155,11 @@ const handleLogin = () => {
             store.state.auth.loading = false;
             router.push({ name: 'Dashboard' });
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+            store.state.auth.loading = false;
+            toast.warning.show = true;
+            toast.warning.message = err.response.data.message;
+        });
 };
 
 const auth = computed(() => store.state.auth);

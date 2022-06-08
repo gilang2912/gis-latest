@@ -56,6 +56,7 @@
                                 <th scope="col" class="px-6 py-3">
                                     Last Login
                                 </th>
+                                <th scope="col" class="px-6 py-3">Role</th>
                                 <th scope="col" class="px-6 py-3">Actions</th>
                             </tr>
                         </thead>
@@ -99,10 +100,21 @@
                                 <td class="px-6 py-4">{{ u.nip }}</td>
                                 <td class="px-6 py-4">{{ u.last_login }}</td>
                                 <td class="px-6 py-4">
+                                    {{ u.role.role_name }}
+                                </td>
+                                <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
                                         <button @click="openEdit(u.id)">
                                             <PencilAltIcon
                                                 class="w-5 h-5 text-blue-600"
+                                            />
+                                        </button>
+                                        <button
+                                            @click="openRole(u.id)"
+                                            title="Tambah Role"
+                                        >
+                                            <PlusCircleIcon
+                                                class="w-5 h-5 text-green-500"
                                             />
                                         </button>
                                         <button @click="openDelete(u.id)">
@@ -244,6 +256,33 @@
         </template>
         <h4 class="py-4">Anda yakin menghapus pengguna ini?</h4>
     </Modal>
+    <Modal
+        v-show="modal.role.show"
+        submitName="Simpan"
+        @actionForm="handleAddRole"
+        @close="closeRole"
+    >
+        <template #title>
+            <PlusCircleIcon class="w-4 h-4" />
+            Tambah Role Pengguna
+        </template>
+        <div class="mb-4">
+            <label
+                for="roles"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400"
+                >Pilih Role</label
+            >
+            <select
+                id="roles"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 capitalize"
+                v-model="param.role_id"
+            >
+                <template v-for="(item, i) in users.roles" :key="i">
+                    <option :value="item.role_id">{{ item.role_name }}</option>
+                </template>
+            </select>
+        </div>
+    </Modal>
 </template>
 
 <script setup>
@@ -260,6 +299,7 @@ import {
     PencilAltIcon,
     TrashIcon,
     UserAddIcon,
+    PlusCircleIcon,
 } from '@heroicons/vue/outline';
 import { computed, reactive, ref } from 'vue';
 import { useStore } from 'vuex';
@@ -273,12 +313,16 @@ const param = reactive({
     password: '',
     password_confirmation: '',
     nip: '',
+    role_id: '',
 });
 const modal = reactive({
     edit: {
         show: false,
     },
     delete: {
+        show: false,
+    },
+    role: {
         show: false,
     },
 });
@@ -291,6 +335,7 @@ const toast = reactive({
 const query = ref('');
 
 store.dispatch('users/getAll');
+store.dispatch('users/roles');
 
 const users = computed(() => store.state.users);
 
@@ -376,5 +421,32 @@ function openDelete(id) {
 function closeDelete() {
     param.id = '';
     modal.delete.show = false;
+}
+
+function handleAddRole() {
+    const data = {
+        user_id: param.id,
+        role_id: param.role_id,
+    };
+    store
+        .dispatch('users/grantRole', data)
+        .then((res) => {
+            if (res.status == 201) {
+                alert(res.data.message);
+                closeRole();
+            }
+        })
+        .catch((err) => console.log(err));
+}
+
+function openRole(id) {
+    param.id = id;
+    modal.role.show = true;
+}
+
+function closeRole() {
+    param.id = '';
+    param.role_id = '';
+    modal.role.show = false;
 }
 </script>

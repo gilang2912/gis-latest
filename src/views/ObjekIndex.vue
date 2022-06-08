@@ -130,12 +130,20 @@
                                             <EyeIcon class="w-5 h-5" />
                                         </router-link>
                                         <button
+                                            v-if="
+                                                (role && role.role_id == 1) ||
+                                                (role && role.role_id == 2)
+                                            "
                                             @click="openEdit(item.kd_op)"
                                             class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                                         >
                                             <PencilAltIcon class="w-5 h-5" />
                                         </button>
                                         <button
+                                            v-if="
+                                                (role && role.role_id == 1) ||
+                                                (role && role.role_id == 2)
+                                            "
                                             @click="openDelete(item.kd_op)"
                                             class="font-medium text-red-600 dark:text-red-500 hover:underline"
                                         >
@@ -487,6 +495,10 @@ const query = ref('');
 store.dispatch('op/getOp');
 
 const op = computed(() => store.state.op);
+
+const role = computed(() =>
+    store.state.auth.data.role ? store.state.auth.data.role : '',
+);
 
 async function searchOp() {
     store.dispatch('op/getOp', query.value);

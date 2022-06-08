@@ -2,7 +2,9 @@
     <PageComponent heading="Dashboard">
         <div class="relative overflow-hidden rounded-lg shadow-md bg-slate-800">
             <div class="sidebar">
-                <div class="p-4 bg-indigo-600 shadow dark:bg-indigo-800">
+                <div
+                    class="p-4 shadow bg-gradient-to-r from-slate-50 via-purple-500 to-red-500 dark:from-slate-900 dark:via-purple-900 dark:to-red-900 dark:border-slate-700"
+                >
                     <h2
                         class="inline-flex items-center gap-1 font-medium text-slate-50"
                     >

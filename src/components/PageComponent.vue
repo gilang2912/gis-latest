@@ -1,5 +1,5 @@
 <template>
-    <header class="bg-slate-50 dark:bg-slate-900">
+    <header class="shadow-md bg-slate-50 dark:bg-slate-900">
         <div class="container">
             <div class="flex items-center justify-between py-4">
                 <h4 v-if="heading" class="font-semibold tracking-tight">

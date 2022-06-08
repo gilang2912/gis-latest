@@ -9,7 +9,8 @@
                         v-bind:class="{
                             'text-slate-600 dark:text-slate-50 bg-white dark:bg-slate-900':
                                 openTab !== 1,
-                            'text-slate-50 bg-indigo-600': openTab === 1,
+                            'text-slate-50 bg-indigo-600 dark:bg-indigo-800':
+                                openTab === 1,
                         }"
                     >
                         <div class="flex items-center justify-center gap-2">
@@ -25,7 +26,8 @@
                         v-bind:class="{
                             'text-slate-600 dark:text-slate-50 bg-white dark:bg-slate-900':
                                 openTab !== 2,
-                            'text-slate-50 bg-indigo-600': openTab === 2,
+                            'text-slate-50 bg-indigo-600 dark:bg-indigo-800':
+                                openTab === 2,
                         }"
                     >
                         <div class="flex items-center justify-center gap-2">

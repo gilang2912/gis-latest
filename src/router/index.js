@@ -7,6 +7,7 @@ import ObjekIndex from '@/views/ObjekIndex.vue';
 import ObjekDetail from '@/views/ObjekDetail.vue';
 import Login from '@/views/auth/Login.vue';
 import Users from '@/views/Users.vue';
+import ChangePassword from '@/views/ChangePassword.vue';
 import Test from '@/views/Test.vue';
 
 const routes = [
@@ -59,6 +60,17 @@ const routes = [
                         { name: 'Home', link: '/' },
                         { name: 'Aplikasi', link: '#' },
                         { name: 'Manage Users' },
+                    ],
+                },
+            },
+            {
+                path: '/ganti-password',
+                name: 'ChangePass',
+                component: ChangePassword,
+                meta: {
+                    breadcrumbs: [
+                        { name: 'Home', link: '/' },
+                        { name: 'Ganti Password' },
                     ],
                 },
             },

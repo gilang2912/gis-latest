@@ -24,7 +24,7 @@
         >
             <div
                 v-show="isOpen"
-                class="absolute right-0 z-30 w-48 mt-1 origin-top-right rounded shadow bg-slate-700"
+                class="absolute right-0 z-30 w-48 mt-1 origin-top-right rounded shadow bg-slate-200 dark:bg-slate-700"
             >
                 <div class="py-1">
                     <slot />
