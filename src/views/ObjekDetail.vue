@@ -25,7 +25,7 @@
                         @click="showSingle"
                         v-for="index in [slider.currentIndex]"
                         :key="index"
-                        class="flex items-center w-[550px] xl:h-[630px] lg:h-[530px] md:h-[400px] sm:h-[350px] cursor-pointer"
+                        class="flex items-center w-[550px] h-screen cursor-pointer"
                     >
                         <img
                             class="object-cover w-full h-full rounded-t-lg md:rounded-none md:rounded-l-lg"
@@ -43,7 +43,7 @@
                     </button>
                 </div>
                 <div
-                    class="relative flex flex-col items-start w-auto gap-2 p-6 bg-slate-50 dark:bg-slate-900 xl:h-[630px] lg:h-[530px] md:h-[400px] sm:h-[350px] rounded-md"
+                    class="relative flex flex-col items-start w-auto h-screen gap-2 p-6 rounded-md bg-slate-50 dark:bg-slate-900"
                 >
                     <h3
                         class="inline-flex items-center gap-2 text-xl font-semibold"
@@ -118,6 +118,20 @@
                         >
                         <span>{{ currentOp.current.payment.p_akhir }}</span>
                     </p>
+                    <p
+                        v-if="currentOp.current.payment"
+                        class="flex items-center gap-2"
+                    >
+                        <span class="font-semibold w-44">Jumlah Bayar</span>
+                        <span>{{ currentOp.current.payment.jumlah }}</span>
+                    </p>
+                    <p
+                        v-if="currentOp.current.payment"
+                        class="flex items-center gap-2"
+                    >
+                        <span class="font-semibold w-44">Tgl. SKPD</span>
+                        <span>{{ currentOp.current.payment.tgl_skpd }}</span>
+                    </p>
                     <p class="flex items-center gap-2">
                         <span class="font-semibold w-44"
                             >Status Pembayaran</span
@@ -132,7 +146,7 @@
                                     currentOp.current.payment.status === 1,
                                 'bg-yellow-500 text-slate-50':
                                     currentOp.current.payment.status === 2,
-                                'bg-blue-500 text-slate-50':
+                                'bg-yellow-600 text-slate-50':
                                     currentOp.current.payment.status === 4,
                             }"
                         >

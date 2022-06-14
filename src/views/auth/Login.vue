@@ -1,5 +1,13 @@
 <template>
     <main>
+        <transition>
+            <AlertBanner
+                v-show="toast.show"
+                :message="toast.message"
+                :color="toast.color"
+                @close="closeToast"
+            />
+        </transition>
         <section class="absolute w-full h-full">
             <div
                 class="absolute top-0 w-full h-full bg-slate-100 dark:bg-slate-900"
@@ -12,13 +20,6 @@
                 <div
                     class="flex flex-col items-center content-center justify-center h-full"
                 >
-                    <transition>
-                        <ToastWarning
-                            v-if="toast.warning.show"
-                            :message="toast.warning.message"
-                            @close="toast.warning.show = false"
-                        />
-                    </transition>
                     <div class="w-full px-4 lg:w-4/12">
                         <div
                             class="relative flex flex-col w-full min-w-0 mb-6 break-words border-0 rounded-lg shadow-lg bg-slate-300"
@@ -46,36 +47,21 @@
                             </div>
                             <div class="flex-auto px-4 py-10 pt-0 lg:px-10">
                                 <form @submit.prevent="handleLogin">
-                                    <div class="relative w-full mb-3">
-                                        <label
-                                            class="block mb-2 text-xs font-bold text-gray-700 uppercase"
-                                            for="grid-password"
-                                            >Username</label
-                                        ><input
-                                            type="text"
-                                            class="w-full px-3 py-3 text-sm text-gray-700 placeholder-gray-400 bg-white border-0 rounded shadow focus:outline-none focus:ring"
-                                            placeholder="Username"
-                                            style="
-                                                transition: all 0.15s ease 0s;
-                                            "
-                                            required
+                                    <div class="mb-4">
+                                        <FloatInputOutline
+                                            label="Username"
+                                            id="username"
                                             v-model="model.username"
+                                            :required="true"
                                         />
                                     </div>
-                                    <div class="relative w-full mb-3">
-                                        <label
-                                            class="block mb-2 text-xs font-bold text-gray-700 uppercase"
-                                            for="grid-password"
-                                            >Password</label
-                                        ><input
+                                    <div class="mb-4">
+                                        <FloatInputOutline
                                             type="password"
-                                            class="w-full px-3 py-3 text-sm text-gray-700 placeholder-gray-400 bg-white border-0 rounded shadow focus:outline-none focus:ring"
-                                            placeholder="Password"
-                                            style="
-                                                transition: all 0.15s ease 0s;
-                                            "
-                                            required
+                                            label="Password"
+                                            id="password"
                                             v-model="model.password"
+                                            :required="true"
                                         />
                                     </div>
                                     <div>
@@ -126,9 +112,10 @@
 
 <script setup>
 import LogoBapenda from '@/components/LogoBapenda.vue';
-import ToastWarning from '@/components/ToastWarning.vue';
+import AlertBanner from '@/components/partials/AlertBanner.vue';
+import FloatInputOutline from '@/components/partials/FloatInputOutline.vue';
 import { RefreshIcon } from '@heroicons/vue/outline';
-import { computed, reactive } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 
@@ -140,11 +127,10 @@ const model = reactive({
     username: '',
     password: '',
 });
-const toast = reactive({
-    warning: {
-        show: false,
-        message: '',
-    },
+const toast = ref({
+    show: false,
+    message: '',
+    color: '',
 });
 
 const handleLogin = () => {
@@ -157,9 +143,21 @@ const handleLogin = () => {
         })
         .catch((err) => {
             store.state.auth.loading = false;
-            toast.warning.show = true;
-            toast.warning.message = err.response.data.message;
+            toast.value.show = true;
+            toast.value.color = 'error';
+            toast.value.message = err.response.data.message;
+            setTimeout(() => {
+                toast.value.show = false;
+                toast.value.color = '';
+                toast.value.message = '';
+            }, 3000);
         });
+};
+
+const closeToast = () => {
+    toa.valuest.value.show = false;
+    toast.value.color = '';
+    toast.value.message = '';
 };
 
 const auth = computed(() => store.state.auth);

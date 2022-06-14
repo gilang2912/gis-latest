@@ -3,7 +3,7 @@
         <div class="relative overflow-hidden rounded-lg shadow-md bg-slate-800">
             <div class="sidebar">
                 <div
-                    class="p-4 shadow bg-gradient-to-r from-slate-50 via-purple-500 to-red-500 dark:from-slate-900 dark:via-purple-900 dark:to-red-900 dark:border-slate-700"
+                    class="flex items-center justify-between p-4 shadow bg-gradient-to-r from-slate-50 via-purple-500 to-red-500 dark:from-slate-900 dark:via-purple-900 dark:to-red-900 dark:border-slate-700"
                 >
                     <h2
                         class="inline-flex items-center gap-1 font-medium text-slate-50"
@@ -11,6 +11,9 @@
                         <LocationMarkerIcon class="w-4 h-4" />
                         List Objek Pajak
                     </h2>
+                    <button @click="reloadMapOp">
+                        <RefreshIcon class="w-5 h-5 drop-shadow-md" />
+                    </button>
                 </div>
                 <div class="p-2 border-b dark:border-slate-800">
                     <input
@@ -18,7 +21,7 @@
                         class="block w-full px-3 py-2 transition duration-200 ease-linear border rounded shadow-inner outline-none text-slate-800 border-slate-400 focus:ring-1 focus:border-indigo-600 focus:ring-indigo-500 dark:text-slate-50 dark:bg-slate-900 dark:border-slate-800"
                         placeholder="Cari Objek Pajak"
                         v-model="data.query"
-                        @keyup.enter="searchOpList"
+                        @keyup="filterOp"
                     />
                 </div>
                 <div id="listings" class="listings">
@@ -38,7 +41,7 @@
                     </div>
                     <div
                         v-else
-                        v-for="(op, index) in opListing.data"
+                        v-for="(op, index) in filterOp"
                         :key="index"
                         :id="`listing-${index}`"
                         class="item"
@@ -62,7 +65,7 @@
                     </div>
                 </div>
             </div>
-            <div id="map"></div>
+            <div id="map" class="h-screen"></div>
         </div>
         <VueEasyLightBox
             escDisabled
@@ -132,15 +135,20 @@ const loadMap = async () => {
     }
 };
 
-// Search data objek pajak
-function searchOpList() {
-    store.dispatch('dashboard/getListOp', data.query).then((res) => {
-        if (data.currentMarker.length) {
-            for (let i = 0; i < data.currentMarker.length; i++) {
-                data.currentMarker[i].remove();
-            }
+async function reloadMapOp() {
+    localStorage.removeItem('map-data');
+    if (data.currentMarker.length) {
+        for (let i = 0; i < data.currentMarker.length; i++) {
+            data.currentMarker[i].remove();
         }
-        res.forEach((mark, key) => {
+    }
+    getMapOp();
+}
+
+async function getMapOp() {
+    // Get all data objek pajak
+    if (localStorage.getItem('map-data')) {
+        store.state.dashboard.data.forEach((mark, key) => {
             const pin = document.createElement('div');
             pin.id = `marker-${key}`;
             pin.className = 'pin';
@@ -153,7 +161,7 @@ function searchOpList() {
                     pin.classList.add('pin-yellow');
                     break;
                 case 4:
-                    pin.classList.add('pin-blue');
+                    pin.classList.add('pin-yellow');
                     break;
                 case 1:
                     pin.classList.add('pin-green');
@@ -173,47 +181,210 @@ function searchOpList() {
                 listing.classList.add('active');
             });
         });
-    });
+    } else {
+        store.dispatch('dashboard/getListOp').then((data) => {
+            data.forEach((mark, key) => {
+                const pin = document.createElement('div');
+                pin.id = `marker-${key}`;
+                pin.className = 'pin';
+
+                switch (mark.payment.status) {
+                    case 3:
+                        pin.classList.add('pin-red');
+                        break;
+                    case 2:
+                        pin.classList.add('pin-yellow');
+                        break;
+                    case 4:
+                        pin.classList.add('pin-yellow');
+                        break;
+                    case 1:
+                        pin.classList.add('pin-green');
+                }
+
+                marker(mark, pin);
+
+                pin.addEventListener('click', (e) => {
+                    flyStore(mark);
+                    createPopup(mark);
+                    const activeItem =
+                        document.getElementsByClassName('active');
+                    e.stopPropagation();
+                    if (activeItem[0]) {
+                        activeItem[0].classList.remove('active');
+                    }
+                    const listing = document.getElementById(`listing-${key}`);
+                    listing.classList.add('active');
+                });
+            });
+        });
+    }
 }
 
-// Get all data objek pajak
-store.dispatch('dashboard/getListOp').then((data) => {
-    data.forEach((mark, key) => {
-        const pin = document.createElement('div');
-        pin.id = `marker-${key}`;
-        pin.className = 'pin';
-
-        switch (mark.payment.status) {
-            case 3:
-                pin.classList.add('pin-red');
-                break;
-            case 2:
-                pin.classList.add('pin-yellow');
-                break;
-            case 4:
-                pin.classList.add('pin-blue');
-                break;
-            case 1:
-                pin.classList.add('pin-green');
-        }
-
-        marker(mark, pin);
-
-        pin.addEventListener('click', (e) => {
-            flyStore(mark);
-            createPopup(mark);
-            const activeItem = document.getElementsByClassName('active');
-            e.stopPropagation();
-            if (activeItem[0]) {
-                activeItem[0].classList.remove('active');
-            }
-            const listing = document.getElementById(`listing-${key}`);
-            listing.classList.add('active');
-        });
-    });
-});
-
 const opListing = computed(() => store.state.dashboard);
+// Search data objek pajak
+const filterOp = computed(() => {
+    let op = store.state.dashboard.data;
+    if (data.query) {
+        if (data.currentMarker.length) {
+            for (let i = 0; i < data.currentMarker.length; i++) {
+                data.currentMarker[i].remove();
+            }
+        }
+        op = op.filter((mark, key) => {
+            if (mark.nm_wp.toLowerCase().includes(data.query.toLowerCase())) {
+                const pin = document.createElement('div');
+                pin.id = `marker-${key}`;
+                pin.className = 'pin';
+                switch (mark.payment.status) {
+                    case 3:
+                        pin.classList.add('pin-red');
+                        break;
+                    case 2:
+                        pin.classList.add('pin-yellow');
+                        break;
+                    case 4:
+                        pin.classList.add('pin-yellow');
+                        break;
+                    case 1:
+                        pin.classList.add('pin-green');
+                }
+                marker(mark, pin);
+                pin.addEventListener('click', (e) => {
+                    flyStore(mark);
+                    createPopup(mark);
+                    const activeItem =
+                        document.getElementsByClassName('active');
+                    e.stopPropagation();
+                    if (activeItem[0]) {
+                        activeItem[0].classList.remove('active');
+                    }
+                    const listing = document.getElementById(`listing-${key}`);
+                    listing.classList.add('active');
+                });
+
+                return mark.nm_wp
+                    .toLowerCase()
+                    .includes(data.query.toLowerCase());
+            }
+
+            if (
+                mark.kecamatan.toLowerCase().includes(data.query.toLowerCase())
+            ) {
+                const pin = document.createElement('div');
+                pin.id = `marker-${key}`;
+                pin.className = 'pin';
+                switch (mark.payment.status) {
+                    case 3:
+                        pin.classList.add('pin-red');
+                        break;
+                    case 2:
+                        pin.classList.add('pin-yellow');
+                        break;
+                    case 4:
+                        pin.classList.add('pin-yellow');
+                        break;
+                    case 1:
+                        pin.classList.add('pin-green');
+                }
+                marker(mark, pin);
+                pin.addEventListener('click', (e) => {
+                    flyStore(mark);
+                    createPopup(mark);
+                    const activeItem =
+                        document.getElementsByClassName('active');
+                    e.stopPropagation();
+                    if (activeItem[0]) {
+                        activeItem[0].classList.remove('active');
+                    }
+                    const listing = document.getElementById(`listing-${key}`);
+                    listing.classList.add('active');
+                });
+
+                return mark.kecamatan
+                    .toLowerCase()
+                    .includes(data.query.toLowerCase());
+            }
+
+            if (mark.npwpd.toLowerCase().includes(data.query.toLowerCase())) {
+                const pin = document.createElement('div');
+                pin.id = `marker-${key}`;
+                pin.className = 'pin';
+                switch (mark.payment.status) {
+                    case 3:
+                        pin.classList.add('pin-red');
+                        break;
+                    case 2:
+                        pin.classList.add('pin-yellow');
+                        break;
+                    case 4:
+                        pin.classList.add('pin-yellow');
+                        break;
+                    case 1:
+                        pin.classList.add('pin-green');
+                }
+                marker(mark, pin);
+                pin.addEventListener('click', (e) => {
+                    flyStore(mark);
+                    createPopup(mark);
+                    const activeItem =
+                        document.getElementsByClassName('active');
+                    e.stopPropagation();
+                    if (activeItem[0]) {
+                        activeItem[0].classList.remove('active');
+                    }
+                    const listing = document.getElementById(`listing-${key}`);
+                    listing.classList.add('active');
+                });
+
+                return mark.npwpd
+                    .toLowerCase()
+                    .includes(data.query.toLowerCase());
+            }
+
+            if (
+                mark.jns_reklame
+                    .toLowerCase()
+                    .includes(data.query.toLowerCase())
+            ) {
+                const pin = document.createElement('div');
+                pin.id = `marker-${key}`;
+                pin.className = 'pin';
+                switch (mark.payment.status) {
+                    case 3:
+                        pin.classList.add('pin-red');
+                        break;
+                    case 2:
+                        pin.classList.add('pin-yellow');
+                        break;
+                    case 4:
+                        pin.classList.add('pin-yellow');
+                        break;
+                    case 1:
+                        pin.classList.add('pin-green');
+                }
+                marker(mark, pin);
+                pin.addEventListener('click', (e) => {
+                    flyStore(mark);
+                    createPopup(mark);
+                    const activeItem =
+                        document.getElementsByClassName('active');
+                    e.stopPropagation();
+                    if (activeItem[0]) {
+                        activeItem[0].classList.remove('active');
+                    }
+                    const listing = document.getElementById(`listing-${key}`);
+                    listing.classList.add('active');
+                });
+
+                return mark.jns_reklame
+                    .toLowerCase()
+                    .includes(data.query.toLowerCase());
+            }
+        });
+    }
+    return op;
+});
 
 function getMarker(e) {
     let id = e.target.id;
@@ -335,11 +506,6 @@ const hide = () => {
 
 onMounted(() => {
     loadMap();
+    getMapOp();
 });
 </script>
-
-<style scoped>
-#map {
-    height: 650px;
-}
-</style>

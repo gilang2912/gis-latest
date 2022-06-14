@@ -1,4 +1,10 @@
 <template>
+    <AlertBanner
+        v-show="toast.show"
+        :color="toast.color"
+        :message="toast.message"
+        @close="toast.show = false"
+    />
     <PageComponent heading="Objek Pajak">
         <TabCustom>
             <template #tabTitle1>
@@ -298,24 +304,18 @@
                             </div>
                             <div class="flex items-center justify-end gap-2">
                                 <BtnDark type="reset">Reset</BtnDark>
-                                <BtnPrimary type="submit">Simpan</BtnPrimary>
+                                <BtnPrimary type="submit">
+                                    <div class="flex items-center gap-1">
+                                        <RefreshIcon
+                                            v-if="state.loading"
+                                            class="w-4 h-4 animate-spin"
+                                        />
+                                        Simpan
+                                    </div>
+                                </BtnPrimary>
                             </div>
                         </form>
                     </div>
-                    <transition>
-                        <ToastSuccess
-                            v-if="toast.success.show"
-                            :message="toast.success.message"
-                            @close="closeSuccessToast"
-                        />
-                    </transition>
-                    <transition>
-                        <ToastWarning
-                            v-if="toast.warning.show"
-                            :message="toast.warning.message"
-                            @close="closeWarningToast"
-                        />
-                    </transition>
                 </div>
             </template>
         </TabCustom>
@@ -435,10 +435,9 @@ import TabCustom from '@/components/TabCustom.vue';
 import InputControl from '@/components/partials/InputControl.vue';
 import BtnPrimary from '@/components/partials/BtnPrimary.vue';
 import BtnDark from '@/components/partials/BtnDark.vue';
+import AlertBanner from '@/components/partials/AlertBanner.vue';
 import { computed, reactive, ref } from 'vue';
 import { clientLocal } from '@/http';
-import ToastSuccess from '@/components/ToastSuccess.vue';
-import ToastWarning from '@/components/ToastWarning.vue';
 import { useStore } from 'vuex';
 import {
     PencilAltIcon,
@@ -446,6 +445,7 @@ import {
     TrashIcon,
     EyeIcon,
     ViewListIcon,
+    RefreshIcon,
 } from '@heroicons/vue/outline';
 import Modal from '@/components/Modal.vue';
 import Pagination from '@/components/partials/Pagination.vue';
@@ -468,17 +468,13 @@ const state = reactive({
     lat: '',
     images: [],
     img_tmp: [],
+    loading: false,
 });
 
-const toast = reactive({
-    success: {
-        show: false,
-        message: '',
-    },
-    warning: {
-        show: false,
-        message: '',
-    },
+const toast = ref({
+    show: false,
+    message: '',
+    color: '',
 });
 
 const modal = reactive({
@@ -532,8 +528,9 @@ async function getOpDetail() {
         })
         .catch((err) => {
             if (err.response.status == 404) {
-                toast.warning.message = err.response.data.message;
-                toast.warning.show = true;
+                toast.value.color = 'error';
+                toast.value.message = err.response.data.message;
+                toast.value.show = true;
             }
         });
 }
@@ -557,13 +554,16 @@ function onImageChange(e) {
 }
 
 async function handleSubmit() {
+    state.loading = true;
     await clientLocal
         .post('/objek-pajak/create', state)
         .then((res) => {
             if (res.status == 201) {
+                state.loading = false;
                 store.dispatch('op/getOp');
-                toast.success.message = res.data.message;
-                toast.success.show = true;
+                toast.value.color = 'success';
+                toast.value.message = res.data.message;
+                toast.value.show = true;
 
                 state.kd_op = '';
                 state.npwpd = '';
@@ -581,20 +581,16 @@ async function handleSubmit() {
                 state.ket = '';
 
                 setTimeout(() => {
-                    toast.success.show = false;
-                    toast.success.message = '';
+                    toast.value.show = false;
+                    toast.value.color = '';
+                    toast.value.message = '';
                 }, 2000);
             }
         })
-        .catch((err) => console.error(err));
-}
-
-function closeSuccessToast() {
-    toast.success.show = false;
-}
-
-function closeWarningToast() {
-    toast.warning.show = false;
+        .catch((err) => {
+            state.loading = false;
+            console.error(err);
+        });
 }
 
 function handleUpdate() {

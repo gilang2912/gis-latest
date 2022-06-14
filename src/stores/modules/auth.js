@@ -20,6 +20,7 @@ export const mutations = {
         state.data = {};
         state.token = null;
         localStorage.removeItem('gis_token');
+        localStorage.removeItem('map-data');
     },
 };
 

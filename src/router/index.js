@@ -8,7 +8,7 @@ import ObjekDetail from '@/views/ObjekDetail.vue';
 import Login from '@/views/auth/Login.vue';
 import Users from '@/views/Users.vue';
 import ChangePassword from '@/views/ChangePassword.vue';
-import Test from '@/views/Test.vue';
+import NotFoundPage from '@/views/NotFoundPage.vue';
 
 const routes = [
     {
@@ -74,11 +74,6 @@ const routes = [
                     ],
                 },
             },
-            {
-                path: '/test',
-                name: 'TestPage',
-                component: Test,
-            },
         ],
     },
     {
@@ -93,6 +88,11 @@ const routes = [
                 component: Login,
             },
         ],
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFoundPage,
     },
 ];
 

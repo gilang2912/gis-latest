@@ -37,7 +37,7 @@
                         'bg-red-500 text-slate-50': model.status === 3,
                         'bg-green-600 text-slate-50': model.status === 1,
                         'bg-yellow-500 text-slate-50': model.status === 2,
-                        'bg-sky-600 text-slate-50': model.status === 4,
+                        'bg-yellow-600 text-slate-50': model.status === 4,
                     }"
                 >
                     {{ payStatus }}
